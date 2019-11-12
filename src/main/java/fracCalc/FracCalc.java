@@ -76,7 +76,7 @@ public class FracCalc {
     	
     	//Parses strings into fractions
     	operand1 = parseFrac(operand1);
-    	//operand2 = parseFrac(operand2);
+    	operand2 = parseFrac(operand2);
     	//Performs function of fractions
     	//String fracAnswer = evaluteAnswer(operand1, operand2, function); 
     	
