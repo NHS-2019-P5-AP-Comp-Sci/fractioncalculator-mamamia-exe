@@ -19,7 +19,7 @@ public class FracCalc {
     	System.out.println(operand2); 
     	
     	//Checks to quit loop 
-    	System.out.println("Type q to quit: ");
+    	System.out.println("Type q to quit or press enter to continue: ");
     	quit = console.nextLine(); 
     	if(quit.equals("q")) {
     		System.out.println("Thank you for using Frac Calc"); 
@@ -53,46 +53,48 @@ public class FracCalc {
     	if(addition > 0) {
     		operand2 = input.substring(addition+3);
     		operand1 = input.substring(0, addition);
-    		function = "add";
+    		function = "a";
     	}
     	else if(subtraction > 0) {
     		operand2 = input.substring(subtraction+3);
     		operand1 = input.substring(0, subtraction);
-    		function = "minus";
+    		function = "s";
     	}
     	else if(division > 0) {
     		operand2 = input.substring(division+3);
     		operand1 = input.substring(0, division);
-    		function = "divide";
+    		function = "d";
     	}
     	else if(multiplication > 0) {
     		operand2 = input.substring(multiplication + 3); 
     		operand1 = input.substring(0, multiplication);
-    		function = "multiply";
+    		function = "m";
     	}
     	else {
 			System.out.println("Invalid input: No Operator"); 
 		}
     	
     	//Parses strings into fractions
-    	operand1 = parseFrac(operand1);
-    	operand2 = parseFrac(operand2);
+    	operand1 = parseFrac(operand1, function);
+    	operand2 = parseFrac(operand2, function);
     	//Performs function of fractions
-    	//String fracAnswer = evaluteAnswer(operand1, operand2, function); 
+    	String fracAnswer = evaluteAnswer(operand1, operand2, function);  
+    	String finalAnswer = simplifyAnswer(fracAnswer);
     	
-    	return operand2;
+    	return finalAnswer;
     }
     
-    public static String parseFrac(String input) {
+    public static String parseFrac(String input, String function) {
     	int multiFrac = input.indexOf("_"); 
     	int regFrac = input.indexOf("/");
+    	int functionMark = input.indexOf(function); 
     	String numerator = "";
     	String denominator  = ""; 
     	String whole = ""; 
     	String fullNum = "";
     	
     	if(multiFrac > 0) {
-    		whole = input.substring(multiFrac - 1, multiFrac);
+    		whole = input.substring(functionMark+1, multiFrac);
     		numerator = input.substring(multiFrac + 1, regFrac); 
     		denominator = input.substring(regFrac + 1); 
     	} else if (multiFrac < 0 & regFrac > 0) {
@@ -105,54 +107,81 @@ public class FracCalc {
     		denominator = "1";
     	} 
     
-    	fullNum = "whole:" + whole + " numerator:" + numerator + " denominator:" + denominator; 
+    	fullNum = "w:" + whole + " n:" + numerator + " d:" + denominator; 
      	return fullNum; 
     }
     
     public static String evaluteAnswer(String op1, String op2, String function) {
-    	String finalAnswer = "";
-    
-    	int denominator1 = (int)op1.charAt(op1.indexOf("denominator:" + 12));
-    	int wholeFrac1 = (denominator1*(int)op1.charAt(op1.indexOf("whole:") + 6));
-    	if(wholeFrac1 > 0) {
-    		int numerator1 = (int)op2.charAt(op1.indexOf("numerator:") + 10)+wholeFrac1;
-    	} else {
-    		int numerator1 = (int)op2.charAt(op1.indexOf("numerator:") + 10); 
+    	
+    	int whole1 = Integer.valueOf(op1.substring(op1.indexOf("w:")+2,op1.indexOf("n:")-1)); 
+    	int whole2 = +Integer.valueOf(op2.substring(op2.indexOf("w:")+2,op2.indexOf("n:")-1));
+    	int deno1 = Integer.valueOf(op1.substring(op1.indexOf("d:")+2));
+    	int deno2 = Integer.valueOf(op2.substring(op2.indexOf("d:")+2));
+    	int num1 = Integer.valueOf(op1.substring(op1.indexOf("n:")+2,op1.indexOf("d:")-1)); 
+    	int num2 = Integer.valueOf(op2.substring(op2.indexOf("n:")+2,op2.indexOf("d:")-1)); 
+    	
+    	if(whole1 != 0) {
+    		num1 = num1 + (whole1*deno1); 
     	}
-    	int denominator2 = (int)op2.charAt(op1.indexOf("denominator:" + 12));
-    	int wholeFrac2 = (denominator2*(int)op2.charAt(op1.indexOf("whole:") + 6));
-    	if(wholeFrac2 > 0) {
-    		int numerator2 = (int)op2.charAt(op1.indexOf("numerator:") + 10)+wholeFrac2;
-    	} else {
-    		int numerator2 = (int)op2.charAt(op1.indexOf("numerator:") + 10); 
+    	if(whole2 != 0) {
+    		num2 = num2 + (whole2*deno2); 
+    	}
+    	
+    	int commonDeno = deno1*deno2; 
+    	int commonNum1 = deno2*num1;
+    	int commonNum2 = deno1*num2; 
+    	String finalAnswer = " ";
+    	
+    	if (function.equals("a")) {
+    		finalAnswer = (commonNum1+commonNum2) + "/" + commonDeno;
+    	}
+    	if (function.equals("s")) {
+    		finalAnswer = (commonNum1-commonNum2) + "/" + commonDeno;
+    	}
+    	if (function.equals("d")) {
+    		finalAnswer = (num1*deno2) + "/" + (deno1*num2);
+    	}
+    	if (function.equals("m")) {
+    		finalAnswer = (num1*num2) + "/" + (deno1*deno2);
     	}
 
-    	int commonDeno = denominator1*denominator2;
-    	int numerator1Ans = denominator2*numerator1;
-    	int numerator2Ans = denominator1*numerator2;
-    	
-    	if(function == "add") {
-    		finalAnswer = (numerator1Ans+numerator2Ans) + "/" + commonDeno; 
-    	} 
-    	
-    	if(function == "minus") {
-    		finalAnswer = (numerator1Ans-numerator2Ans) + "/" + commonDeno;
-    	}
-    	
-    	if(function == "multiply") {
-    		finalAnswer = (numerator1*numerator2) + "/" + commonDeno; 
-    	}
-    	
-    	if(function == "divide") {
-    		finalAnswer = numerator1Ans + "/" + (denominator1*numerator2);
-    	}
-    	
-    	return finalAnswer; 	
+    	return finalAnswer; 
     }
     
     public static String simplifyAnswer(String answer) {
+    	int num = Integer.valueOf(answer.substring(0,answer.indexOf("/"))); 
+    	int deno = Integer.valueOf(answer.substring(answer.indexOf("/")+1));
+    	int count = 0; 
+    	int tempnum = Integer.valueOf(answer.substring(0,answer.indexOf("/"))); 
+    	int tempdeno = Integer.valueOf(answer.substring(answer.indexOf("/")+1));
     	
-    	return null; 
+    	while(true) {
+    	tempnum = tempnum - tempdeno; 
+    	count++; 
+    	if(tempnum < 0) {
+    			count --; 
+    			break; 
+    		}
+    	}
+    	
+    	num = num - (count*deno); 
+    	
+    	int gcd = 1; 
+        for(int i = 1; i <= num && i <= deno; i++)
+        {
+            if(num%i==0 && deno%i==0)
+                gcd = i;
+        }
+        
+        num = num/gcd;
+        deno = deno/gcd;  
+        
+        if(num == 0) {
+        	return count + ""; 
+        } else {
+        	return count + "_" + num + "/" + deno;  
+        } 
+        
     }
     
 
