@@ -178,7 +178,13 @@ public class FracCalc {
         
         if(num == 0) {
         	return count + ""; 
-        } else {
+        } 
+        
+        if(deno == 1) {
+        	return num + ""; 
+        }
+        
+        else {
         	return count + "_" + num + "/" + deno;  
         } 
         
