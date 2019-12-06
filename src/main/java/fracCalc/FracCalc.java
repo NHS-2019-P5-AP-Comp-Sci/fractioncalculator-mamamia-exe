@@ -114,18 +114,34 @@ public class FracCalc {
     public static String evaluteAnswer(String op1, String op2, String function) {
     	
     	int whole1 = Integer.valueOf(op1.substring(op1.indexOf("w:")+2,op1.indexOf("n:")-1)); 
-    	int whole2 = +Integer.valueOf(op2.substring(op2.indexOf("w:")+2,op2.indexOf("n:")-1));
+    	int whole2 = Integer.valueOf(op2.substring(op2.indexOf("w:")+2,op2.indexOf("n:")-1));
     	int deno1 = Integer.valueOf(op1.substring(op1.indexOf("d:")+2));
     	int deno2 = Integer.valueOf(op2.substring(op2.indexOf("d:")+2));
     	int num1 = Integer.valueOf(op1.substring(op1.indexOf("n:")+2,op1.indexOf("d:")-1)); 
     	int num2 = Integer.valueOf(op2.substring(op2.indexOf("n:")+2,op2.indexOf("d:")-1)); 
     	
+    	
     	if(whole1 != 0) {
-    		num1 = num1 + (whole1*deno1); 
+    		num1 = num1 + Math.abs((whole1*deno1)); 
     	}
+    	if (num1 == 0) {
+    		num1 = whole1; 
+    	} 
+    	
     	if(whole2 != 0) {
-    		num2 = num2 + (whole2*deno2); 
+    		num2 = num2 + Math.abs((whole2*deno2)); 
     	}
+    	if(num2 == 0) {
+    		num2 = whole2; 
+    	}
+    	
+    	if(whole1 < 0) {
+    		num1 = -num1; 
+    	}
+    	if(whole2 < 0) {
+    		num2 = -num2; 
+    	}
+    	
     	
     	int commonDeno = deno1*deno2; 
     	int commonNum1 = deno2*num1;
@@ -139,37 +155,63 @@ public class FracCalc {
     		finalAnswer = (commonNum1-commonNum2) + "/" + commonDeno;
     	}
     	if (function.equals("d")) {
-    		finalAnswer = (num1*deno2) + "/" + (deno1*num2);
+    		if(deno1*num2 == 0) {
+    			finalAnswer = "INVALID INPUT CANNOT DIVIDE BY 0"; 
+    		} if((num1*deno2 < 0) && (deno1*num2 < 0)) {
+    			finalAnswer = Math.abs((num1*deno2)) + "/" + Math.abs((deno1*num2)); 
+    		} if ((deno1*num2 < 0)) {
+    			finalAnswer = -(num1*deno2) + "/" + -(deno1*num2); 
+    		}
+    		
+    		else { 
+    			finalAnswer = (num1*deno2) + "/" + (deno1*num2);
+    		} 
     	}
     	if (function.equals("m")) {
     		finalAnswer = (num1*num2) + "/" + (deno1*deno2);
     	}
-
+    	 
+    	System.out.println(finalAnswer); 
     	return finalAnswer; 
     }
     
     public static String simplifyAnswer(String answer) {
+    	if(answer.equals("INVALID INPUT CANNOT DIVIDE BY 0")) {
+    		return answer; 
+    	}
+    	
+    	else { 
     	int num = Integer.valueOf(answer.substring(0,answer.indexOf("/"))); 
     	int deno = Integer.valueOf(answer.substring(answer.indexOf("/")+1));
     	int count = 0; 
-    	int tempnum = Integer.valueOf(answer.substring(0,answer.indexOf("/"))); 
-    	int tempdeno = Integer.valueOf(answer.substring(answer.indexOf("/")+1));
+    	int tempnum = Math.abs(Integer.valueOf(answer.substring(0,answer.indexOf("/")))); 
+    	int tempdeno = Math.abs(Integer.valueOf(answer.substring(answer.indexOf("/")+1)));
     	
     	while(true) {
-    	tempnum = tempnum - tempdeno; 
-    	count++; 
+    		tempnum = tempnum - tempdeno;
+    		count++; 
     	if(tempnum < 0) {
     			count --; 
     			break; 
     		}
     	}
     	
-    	num = num - (count*deno); 
+    	if(num < 0 ) {
+    		count = -count;
+    		if(count == 0) {
+    			num = num; 
+    		} else {
+    			num = Math.abs(num) - (-count*deno); 
+    		} 
+    	} else {
+    		num = num - (count*deno); 
+    	}
+    	
     	
     	int gcd = 1; 
-        for(int i = 1; i <= num && i <= deno; i++)
+        for(int i = 1; i <= Math.abs(num) && i <= deno; i++)
         {
-            if(num%i==0 && deno%i==0)
+        if(num%i==0 && deno%i==0)
                 gcd = i;
         }
         
@@ -184,13 +226,15 @@ public class FracCalc {
         	return num + ""; 
         }
         
+        if(count == 0) {
+        	return num + "/" + deno; 
+        }
+        
         else {
         	return count + "_" + num + "/" + deno;  
         } 
         
+    	} 
+        
     }
-    
-
-    // TODO: Fill in the space below with any helper methods that you think you will need
-
 }
